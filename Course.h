@@ -53,37 +53,16 @@ class Course {
 private:
     int CourseID;
     int numOfLessons;
-    DLList<Lesson*> no_views_list;
-    Lesson* LessonArray;
+    HASH_TABLE<Lesson*> Lessons;
 
 public:
     Course() = default;
     Course(int courseId, int numOfLessons = 0):
-            CourseID(courseId), numOfLessons(numOfLessons), no_views_list(), LessonArray(nullptr){
-        if (numOfLessons != 0){
-            LessonArray = new Lesson[numOfLessons]();
-        }
-        if (numOfLessons == 0 ) {
-            LessonArray = nullptr;
-        }
-        for (int i = 0; i < numOfLessons; ++i) {
-            LessonArray[i] = Lesson(courseId,i);
-            Lesson* LessonInArray = &LessonArray[i];
-//            Lesson* LessonInArray = new Lesson(courseId, i);
-            Node<Lesson*>* temp = no_views_list.GetLast();
-            no_views_list.Insert(temp, LessonInArray);
-            LessonInArray->SetPointerToCharts(no_views_list.GetLast());
-            LessonArray[i] = *LessonInArray;
-            //delete LessonInArray;/***/ fixed no allocation
-        }
-    };
-    ~Course(){
-        delete[] LessonArray;
-    };
+            CourseID(courseId), numOfLessons(numOfLessons), Lessons(){};
+    ~Course() = default;
     int GetCourseID(){return CourseID;}
     int GetCourseNumOfLessons(){return numOfLessons;}
-    DLList<Lesson*> * GetNotViewedList(){return &no_views_list;}
-    Lesson* GetLessonArray(){return LessonArray;}
+    HASH_TABLE<Lesson*> * GetLessonsTable(){return &Lessons;}
     bool operator>(Course const & C) const
     {
         return this->CourseID > C.CourseID;

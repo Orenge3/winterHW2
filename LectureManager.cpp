@@ -5,6 +5,7 @@
 StatusTypeCL LectureManager::AddCourse(int courseID) {
     try {
         Course *Course_to_add = new Course(courseID);
+        return (StatusTypeCL)courses.Insert(courseID,&Course_to_add);
     }
 /**                     implement new DB                     **/
     catch (std::bad_alloc&) {
@@ -13,112 +14,80 @@ StatusTypeCL LectureManager::AddCourse(int courseID) {
 }
 
 StatusTypeCL LectureManager::RemoveCourse(int courseID) {
-    Course* tempCourseInTree = new Course(courseID);
-    AVLTree<Course*>::node* out = new AVLTree<Course*>::node();
-    Course* tempCourseInNotViewed;
-    AVLTree<Course*>::node* temp;
-    AVL_RESULT  res = course_tree.Find(tempCourseInTree,out);
-    switch (res) {
-        case AVL_FAILURE: //Course does not exist
-            delete tempCourseInTree;
-            delete out;
-            return FAILURE_CL;
-        case AVL_SUCCESS: {
-            Course* found = *(out->_data);
-            int numOfLessons = found->GetCourseNumOfLessons();
-            totalNumOfLessons -= numOfLessons;
-            bool all_lessons_viewed = true;
-            for (int i = 0; i < numOfLessons; ++i) {
-                //delete lessons
-//                void *place = tempCourseInTree->GetLessonArray()[i].GetPointerToCharts();
-                Lesson *tempLesson = &found->GetLessonArray()[i];
-                if (tempLesson->GetPointerToCharts() ==
-                    nullptr) {// it has views
-                    //delete lesson from viewed list
-                    viewed_lessons_tree.Delete(tempLesson);
-                    continue;
-                }
-//                //delete lesson in not viewed
-//                found->GetNotViewedList()->
-//                Delete((Node<Lesson*>*)tempLesson->GetPointerToCharts());
-                all_lessons_viewed = false;
-            }
-            //delete course in not viewed tree if it exits
-            if (!all_lessons_viewed)
-                not_viewed_courses.Delete(tempCourseInTree);
-            //delete course from tree
-            course_tree.Delete(tempCourseInTree);
-//            delete[] found->GetLessonArray();
-            delete found;
-            delete tempCourseInTree;
-            delete out;
-            return SUCCESS_CL;
-        }
-        default:
-            break;
+    Course* tempCourseInTable = *courses.Find(courseID);
+
+    //course does not exist
+    if (!tempCourseInTable) return FAILURE_CL;
+
+    int numOfLessons = tempCourseInTable->GetCourseNumOfLessons();
+    //course has no Lessons
+    if (numOfLessons == 0){
+        //simply remove from hash table
+        return (StatusTypeCL)courses.Remove(courseID);
     }
-    delete tempCourseInTree;
-    delete out;
-    return FAILURE_CL;
+    totalNumOfLessons -= numOfLessons;
+    //delete all Lessons with views from viewed tree,
+    //and all lesson with no views from course itself
+    return SUCCESS_CL;
 }
 
 StatusTypeCL LectureManager::AddLecture(int courseID, int *lectureID) {
-    return ALLOCATION_ERROR_CL;
+    Course* tempCourseInTable = *courses.Find(courseID);
+
+    //course does not exist
+    if (!tempCourseInTable) return FAILURE_CL;
+    int numOfLessons = tempCourseInTable->GetCourseNumOfLessons();
+    try {
+        Lesson *Lesson_to_add = new Lesson(courseID,numOfLessons);
+        *lectureID = numOfLessons;
+        numOfLessons++;
+        return (StatusTypeCL)tempCourseInTable->
+        GetLessonsTable()->Insert(*lectureID,&Lesson_to_add);
+    }
+    catch (std::bad_alloc&) {
+        return ALLOCATION_ERROR_CL;
+    }
 }
 
 StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
-    Course * toFind = new Course(courseID);
-    AVLTree<Course*>::node * Found_out_node = new AVLTree<Course*>::node();
-    if (this->course_tree.Find(toFind, Found_out_node) == AVL_FAILURE) {
-        delete toFind;
-        delete Found_out_node;
-        return FAILURE_CL;
-    }
-    Course * Course_Found = *(Found_out_node->_data);
-    /** STILL important **/
-    if (classID+1 > Course_Found->GetCourseNumOfLessons()){
-        delete toFind;
-        delete Found_out_node;
+    Course* tempCourseInTable = *courses.Find(courseID);
+
+    //course does not exist
+    if (!tempCourseInTable) return FAILURE_CL;
+
+    if (classID+1 > tempCourseInTable->GetCourseNumOfLessons()){
         return INVALID_INPUT_CL;
     }
-    Lesson * addTo = & Course_Found->GetLessonArray()[classID];
-    if (addTo->GetTimeWatched() == 0){
-        //oren changed the source of the pointer
-        Node<Lesson*> * L_node = (Node<Lesson*>*)Course_Found->GetLessonArray()[classID].GetPointerToCharts();
-        if (L_node == nullptr)
-            return ALLOCATION_ERROR_CL;
-        Course_Found->GetNotViewedList()->Delete(L_node);
-        this->not_viewed_courses.Find(toFind, Found_out_node);
-        Course * Not_Viewed_course_ptr = *(Found_out_node->_data);
-        ////removed for double delete. since our tree has pointers we have the
-        //// same data in both trees can change this.
-//        Not_Viewed_course_ptr->GetNotViewedList()->Delete(L_node);
-        if(Not_Viewed_course_ptr->GetNotViewedList() == nullptr) {
-            if( this->not_viewed_courses.Delete(Not_Viewed_course_ptr) != AVL_SUCCESS) {
-                delete toFind;
-                delete Found_out_node;
-                return FAILURE_CL;
-            }
-        }
+    Lesson * addTo = *tempCourseInTable->GetLessonsTable()->Find(classID);
+    /*******    not supposed to happen  ******/
+    if (!addTo) return FAILURE_CL;
+
+    // TODO do we take out of hash table or not?
+    if (addTo->GetTimeWatched() == 0){ //not in viewed tree yet
         addTo->watchLesson(time);
-        addTo->SetPointerToCharts(nullptr);
-        delete (toFind);
-        delete Found_out_node;
-        return (StatusTypeCL) this->viewed_lessons_tree.Insert(addTo);
+        //TODO how do we tell apart lessons in your tree?
+        viewed_lessons_tree.Insert(addTo,classID);
+//        if(Not_Viewed_course_ptr->GetNotViewedList() == nullptr) {
+//            if( this->not_viewed_courses.Delete(Not_Viewed_course_ptr) != AVL_SUCCESS) {
+//                delete toFind;
+//                delete Found_out_node;
+//                return FAILURE_CL;
+//            }
+//        }
+//        addTo->watchLesson(time);
+//        addTo->SetPointerToCharts(nullptr);
+//        delete (toFind);
+//        delete Found_out_node;
+//        return (StatusTypeCL) this->viewed_lessons_tree.Insert(addTo);
     }
-    AVLTree<Lesson*>::node * addToViewed_node = new AVLTree<Lesson*>::node();
-    if (this->viewed_lessons_tree.Find(addTo, addToViewed_node) == AVL_FAILURE){
-        delete addToViewed_node;
-        delete toFind;
-        delete Found_out_node;
-        return FAILURE_CL;
-    }
-    delete addToViewed_node;
-    delete Found_out_node;
-    delete (toFind);
-    this->viewed_lessons_tree.Delete(addTo);
-    addTo->watchLesson(time);
-    return (StatusTypeCL)this->viewed_lessons_tree.Insert(addTo);
+    //TODO needs further debate
+    //find in watched tree
+    Lesson* temp = *viewed_lessons_tree.Find(classID);
+    temp->watchLesson(time);
+    //delete from tree and re insert
+    viewed_lessons_tree.Delete(classID);
+    viewed_lessons_tree.Insert(temp,classID);
+    return SUCCESS_CL;
 }
 
 StatusTypeCL
