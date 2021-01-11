@@ -1,7 +1,7 @@
 
 #ifndef DS_HW2_WET_COURSE_H
 #define DS_HW2_WET_COURSE_H
-#include "DS_AVL.h"
+#include "AVL.h"
 const int ZERO_STREAMS = 0;
 class Lesson{
     int courseId;

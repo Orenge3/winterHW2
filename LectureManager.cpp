@@ -183,11 +183,10 @@ void FillArrayFromNotViewed(int** courses, int** classes, int* counter, int numO
     }
 }
 
-StatusTypeCL LectureManager::GetMostViewedClasses(int numOfClasses, int *courses,
-                                                  int *classes) {
+StatusTypeCL LectureManager::GetIthWatchedClass(int numOfClasses, int *courseID,
+                                                int *classeID){
     if (numOfClasses > this->totalNumOfLessons)
         return FAILURE_CL;
-    AVLTree<Lesson*>::node* root = this->viewed_lessons_tree.treeEntry;
     int counter = numOfClasses;
     FillArrayFromViewed(&courses, &classes, &counter, numOfClasses, root);
     // set current node to smallest

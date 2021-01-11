@@ -31,7 +31,7 @@ public:
     StatusTypeCL AddLecture(int courseID, int* lectureID);
     StatusTypeCL WatchClass(int courseID, int classID, int time);
     StatusTypeCL TimeViewed(int courseID, int classId, int *timeViewed);
-    StatusTypeCL GetMostViewedClasses(int numOfClasses, int* courses, int* classes);
+    StatusTypeCL GetIthWatchedClass(int numOfClasses, int* courseID, int* classeID);
     void Quit();
 };
 

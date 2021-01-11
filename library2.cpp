@@ -56,7 +56,7 @@ StatusType TimeViewed(void *DS, int courseID, int classID, int *timeViewed) {
 StatusType
 GetIthWatchedClass(void *DS, int i, int *courseID, int *classID) {
     if (DS == nullptr || i <= 0) return INVALID_INPUT;
-    return (StatusType)((LectureManager*)DS)->GetMostViewedClasses(i,
+    return (StatusType)((LectureManager*)DS)->GetIthWatchedClass(i,
                                                                    courseID,
                                                                    classID);
 }
