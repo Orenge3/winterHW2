@@ -4,10 +4,9 @@
 #ifndef DS_HW2_WET_LECTUREMANAGER_H
 #define DS_HW2_WET_LECTUREMANAGER_H
 
-#include "DS_AVL.h" //we can change tree
-#include "DLLIST.h" //we can change list
+#include "hash_table.h" //we can change tree
+#include "AVL.h" //we can change list
 
-#include "library.h"
 #include "Course.h"
 
 typedef enum {
@@ -20,15 +19,16 @@ typedef enum {
 
 class LectureManager {
 private:
-    AVLTree<Course*> course_tree;
-    AVLTree<Course*> not_viewed_courses;
+    /**           implement new DB                   **/
+    HASH_TABLE<Course*> courses;
     AVLTree<Lesson*> viewed_lessons_tree;
     int totalNumOfLessons;
 public:
     LectureManager() = default;
     ~LectureManager() = default;
-    StatusTypeCL AddCourse(int courseID, int numOfClasses);
+    StatusTypeCL AddCourse(int courseID);
     StatusTypeCL RemoveCourse(int courseID);
+    StatusTypeCL AddLecture(int courseID, int* lectureID);
     StatusTypeCL WatchClass(int courseID, int classID, int time);
     StatusTypeCL TimeViewed(int courseID, int classId, int *timeViewed);
     StatusTypeCL GetMostViewedClasses(int numOfClasses, int* courses, int* classes);

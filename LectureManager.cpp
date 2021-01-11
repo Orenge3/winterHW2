@@ -2,28 +2,11 @@
 
 #include "LectureManager.h"
 
-StatusTypeCL LectureManager::AddCourse(int courseID, int numOfClasses) {
+StatusTypeCL LectureManager::AddCourse(int courseID) {
     try {
-        Course* Course_to_add = new Course(courseID, numOfClasses);
-        //add to course_tree
-        AVL_RESULT res = course_tree.Insert(Course_to_add);
-        switch (res) {
-            case AVL_FAILURE: { //Course already exists
-                delete Course_to_add;
-                return FAILURE_CL;
-            }
-            case AVL_SUCCESS: //Course added to Course tree.
-                totalNumOfLessons += numOfClasses;
-                // add lessons to noViews list
-                not_viewed_courses.Insert(Course_to_add);
-                return SUCCESS_CL;
-            case AVL_ALLOCATION_ERROR: return ALLOCATION_ERROR_CL;
-            case AVL_INVALID_INPUT: return INVALID_INPUT_CL;
-            case AVL_NODE_NOT_FOUND: return INVALID_INPUT_CL;
-            case AVL_EMPTY: return FAILURE_CL;
-        }
-        return FAILURE_CL;
+        Course *Course_to_add = new Course(courseID);
     }
+/**                     implement new DB                     **/
     catch (std::bad_alloc&) {
         return ALLOCATION_ERROR_CL;
     }
@@ -79,6 +62,10 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
     return FAILURE_CL;
 }
 
+StatusTypeCL LectureManager::AddLecture(int courseID, int *lectureID) {
+    return ALLOCATION_ERROR_CL;
+}
+
 StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
     Course * toFind = new Course(courseID);
     AVLTree<Course*>::node * Found_out_node = new AVLTree<Course*>::node();
@@ -88,6 +75,7 @@ StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
         return FAILURE_CL;
     }
     Course * Course_Found = *(Found_out_node->_data);
+    /** STILL important **/
     if (classID+1 > Course_Found->GetCourseNumOfLessons()){
         delete toFind;
         delete Found_out_node;
@@ -152,7 +140,6 @@ LectureManager::TimeViewed(int courseID, int classId, int *timeViewed) {
     delete toFind;
     return SUCCESS_CL;
 }
-
 void FillArrayFromViewed(int** courses, int** classes, int* counter, int numOfClasses,  AVLTree<Lesson*>::node* root) {
     if (root != nullptr)
     {
@@ -195,6 +182,7 @@ void FillArrayFromNotViewed(int** courses, int** classes, int* counter, int numO
         }
     }
 }
+
 StatusTypeCL LectureManager::GetMostViewedClasses(int numOfClasses, int *courses,
                                                   int *classes) {
     if (numOfClasses > this->totalNumOfLessons)
@@ -212,7 +200,6 @@ StatusTypeCL LectureManager::GetMostViewedClasses(int numOfClasses, int *courses
 }
 
 void LectureManager::Quit() {
-    this->not_viewed_courses.DeleteTree(false);
-    this->viewed_lessons_tree.DeleteTree(false);
-    this->course_tree.DeleteTree(true);
+//    this->viewed_lessons_tree.DeleteTree(false);
+//    this->course_tree.DeleteTree(true);
 }
