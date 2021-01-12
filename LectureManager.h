@@ -20,7 +20,7 @@ typedef enum {
 class LectureManager {
 private:
     /**           implement new DB                   **/
-    HASH_TABLE<Course*> courses;
+    HASH_TABLE<Course> courses;
     AVLTree<Lesson*> viewed_lessons_tree;
     int totalNumOfLessons;
 public:

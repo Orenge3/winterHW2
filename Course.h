@@ -53,7 +53,7 @@ class Course {
 private:
     int CourseID;
     int numOfLessons;
-    HASH_TABLE<Lesson*> Lessons;
+    HASH_TABLE<Lesson> Lessons;
 
 public:
     Course() = default;
@@ -62,7 +62,8 @@ public:
     ~Course() = default;
     int GetCourseID(){return CourseID;}
     int GetCourseNumOfLessons(){return numOfLessons;}
-    HASH_TABLE<Lesson*> * GetLessonsTable(){return &Lessons;}
+    void IncNumOfLessons(){ numOfLessons++;}
+    HASH_TABLE<Lesson> * GetLessonsTable(){return &Lessons;}
     bool operator>(Course const & C) const
     {
         return this->CourseID > C.CourseID;
