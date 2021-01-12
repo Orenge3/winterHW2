@@ -209,6 +209,7 @@ StatusTypeCL LectureManager::GetIthWatchedClass(int i, int *courseID,
 }
 
 void LectureManager::Quit() {
+
 //    this->viewed_lessons_tree.DeleteTree(false);
 //    this->course_tree.DeleteTree(true);
 }
