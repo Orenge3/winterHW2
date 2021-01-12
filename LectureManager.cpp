@@ -22,7 +22,7 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
     //course has no Lessons
     if (numOfLessons == 0){
         //simply remove from hash table
-        delete tempCourseInTable;
+//        delete tempCourseInTable;
         return (StatusTypeCL)courses.Remove(courseID);
     }
     //delete all Lessons with views from viewed tree,
@@ -31,7 +31,7 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
         HASH_TABLE<Lesson> * lessons = tempCourseInTable->GetLessonsTable();
         Lesson* tempLesson = lessons->Find(i);
         //lesson not found - not supposed to happen
-        if (!tempLesson){
+        if (tempLesson != nullptr){
             //lesson has views
             if (tempLesson->GetTimeWatched() > 0){
                 //TODO- how do ID lessons in tree?
@@ -45,11 +45,11 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
                 viewed_lessons_tree.Delete(toDel);
             }//delete only from table
             lessons->Remove(i);
-            delete tempLesson;
+//            delete tempLesson;
         }
     }
     courses.Remove(courseID);
-    delete tempCourseInTable;
+//    delete tempCourseInTable;
     return SUCCESS_CL;
 }
 
