@@ -23,6 +23,7 @@ private:
     HASH_TABLE<Course> courses;
     AVLTree<Lesson*> viewed_lessons_tree;
     int totalNumOfLessons;
+    int viewedNumOfLessons;
 public:
     LectureManager() = default;
     ~LectureManager() = default;
@@ -31,7 +32,7 @@ public:
     StatusTypeCL AddLecture(int courseID, int* lectureID);
     StatusTypeCL WatchClass(int courseID, int classID, int time);
     StatusTypeCL TimeViewed(int courseID, int classId, int *timeViewed);
-    StatusTypeCL GetIthWatchedClass(int numOfClasses, int* courseID, int* classeID);
+    StatusTypeCL GetIthWatchedClass(int i, int* courseID, int* classID);
     void Quit();
 };
 

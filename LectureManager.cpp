@@ -37,6 +37,7 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
                 //TODO- how do ID lessons in tree?
                 //TODO -currently using lesson ID
                 //delete from tree and table
+                viewedNumOfLessons--;
                 viewed_lessons_tree.Delete(tempLesson->GetLessonID());
             }//delete only from table
             lessons->Remove(i);
@@ -58,6 +59,7 @@ StatusTypeCL LectureManager::AddLecture(int courseID, int *lectureID) {
         Lesson *Lesson_to_add = new Lesson(courseID,numOfLessons);
         *lectureID = numOfLessons;
         tempCourseInTable->IncNumOfLessons();
+        totalNumOfLessons++;
         return (StatusTypeCL)tempCourseInTable->
         GetLessonsTable()->Insert(*lectureID,Lesson_to_add);
     }
@@ -84,6 +86,7 @@ StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
         addTo->watchLesson(time);
         //TODO how do we tell apart lessons in your tree?
         viewed_lessons_tree.Insert(addTo,addTo->GetLessonID());
+        viewedNumOfLessons++;
         return SUCCESS_CL;
 //        if(Not_Viewed_course_ptr->GetNotViewedList() == nullptr) {
 //            if( this->not_viewed_courses.Delete(Not_Viewed_course_ptr) != AVL_SUCCESS) {
@@ -186,17 +189,21 @@ LectureManager::TimeViewed(int courseID, int classId, int *timeViewed) {
 //    }
 //}
 
-StatusTypeCL LectureManager::GetIthWatchedClass(int numOfClasses, int *courseID,
-                                                int *classeID){
-//    if (numOfClasses > this->totalNumOfLessons)
-//        return FAILURE_CL;
-//    int counter = numOfClasses;
-//    FillArrayFromViewed(&courses, &classes, &counter, numOfClasses, root);
+StatusTypeCL LectureManager::GetIthWatchedClass(int i, int *courseID,
+                                                int *classID){
+
+    if (i > this->viewedNumOfLessons)
+        return FAILURE_CL;
+    AVLNode<Lesson*> *tempNode = viewed_lessons_tree.GetKHighestNde(i);
+    *courseID = tempNode->data->GetCourse();
+    *classID = tempNode->data->GetLessonID();
+//    int counter = i;
+//    FillArrayFromViewed(&courses, &classes, &counter, i, root);
 //    // set current node to smallest
 //    Course * data = nullptr;
 //    this->not_viewed_courses.treeGetSmallest(data);
-//    if (numOfClasses >0) {
-//        FillArrayFromNotViewed(&courses, &classes, &counter, numOfClasses, this->not_viewed_courses.currentNode, &this->not_viewed_courses);
+//    if (i >0) {
+//        FillArrayFromNotViewed(&courses, &classes, &counter, i, this->not_viewed_courses.currentNode, &this->not_viewed_courses);
 //    }
     return SUCCESS_CL;
 }
