@@ -3,19 +3,41 @@
 #include<iostream>
 #include<math.h>
 
+
+ /**---- KEY PROPOSITION------**/ //actually, ity is similar to Class, but the operator is doing the difference
+class CLASS_AVL_KEY{
+private:
+    int time_watched;
+    int class_id;
+    int course_id;
+
+public:
+    CLASS_AVL_KEY(int time_watched = 0 ,int class_id = 0, int course_id = 0 ) : time_watched( time_watched), class_id(class_id), course_id(course_id){};
+    ~CLASS_AVL_KEY() = default;
+    bool operator>(CLASS_AVL_KEY key){
+        if (this->time_watched > key.time_watched)
+            return true;
+        else if ((this->time_watched == key.time_watched) && (this->course_id < key.course_id))
+            return true;
+        else if ((this->time_watched == key.time_watched) && (this->course_id == key.course_id) && (this->class_id < key.class_id))
+            return true;
+        return false;
+    }
+};
+
 /* AVL node */
 template <class T>
 class AVLNode {
 public:
 	T data;
 	double key;
-	int left_sum, right_sum;
+	//int left_sum, right_sum;
 	int num_of_left, num_of_right;
 	AVLNode *left, *right;
 	int depth;
 
-	AVLNode(T d , double k = 0) : data(d), key(k), depth(1), num_of_left(0), 
-		num_of_right(0) ,left_sum(0), right_sum(0), left(nullptr), right(nullptr) {}
+	AVLNode(T d , double k = 0) : data(d), key(k), depth(1) , num_of_left(0),
+		num_of_right(0) /*,left_sum(0), right_sum(0)*/, left(nullptr), right(nullptr) {}
 	~AVLNode() = default;
 };
 
@@ -36,12 +58,12 @@ public:
 
 	void PrintInOrder();//for debugging purposes
 	AVLNode<T>* GetKHighestNde(int k);
-	int GetKHighestSum(int k);
+	//int GetKHighestSum(int k);
 };
 
 using namespace std;
 
-
+/*
 // functions for merging 2 trees //
 template <class T>
 void TreeToArray(AVLNode<T> *node, AVLNode<T>** arr, int* index) {
@@ -53,6 +75,7 @@ void TreeToArray(AVLNode<T> *node, AVLNode<T>** arr, int* index) {
 		TreeToArray(node->right, arr, index);
 	}
 }
+
 
 // functions for merging 2 trees //
 template <class T>
@@ -115,7 +138,7 @@ void insertArrayIntoTree(AVLNode<T>* node, AVLNode<T>** arr, int* index) {
 	insertArrayIntoTree(node->right, arr, index);
 	if (node->left != nullptr) {
 		node->num_of_left = node->left->num_of_left + node->left->num_of_right + 1;
-		node->left_sum = node->left->left_sum + node->left->right_sum + (int)node->left->key;
+		//node->left_sum = node->left->left_sum + node->left->right_sum + (int)node->left->key;
 	}
 	if (node->right != nullptr) {
 		node->num_of_right = node->right->num_of_left + node->right->num_of_right + 1;
@@ -175,7 +198,7 @@ AVLTree<T>* mergeTrees(AVLTree<T>* tree1, AVLTree<T>* tree2) {
 	delete[] merged_arr;
 	return tree;
 }
-
+*/
 
 
 //get the maximum of two numbers
@@ -222,15 +245,15 @@ AVLNode<T>* RotateRight(AVLNode<T>* node)
 
 	//updates sums
 	if (right_node) {
-		node->left_sum = right_node->left_sum + right_node->right_sum + (int)right_node->key;
+		//node->left_sum = right_node->left_sum + right_node->right_sum + (int)right_node->key;
 		node->num_of_left = right_node->num_of_left + right_node->num_of_right + 1;
 	}
 	else {
-		node->left_sum = 0;
+		//node->left_sum = 0;
 		node->num_of_left = 0;
 	}
 
-	left_node->right_sum = node->left_sum + node->right_sum + (int)node->key;
+	//left_node->right_sum = node->left_sum + node->right_sum + (int)node->key;
 	left_node->num_of_right = node->num_of_left + node->num_of_right + 1;
 
 	// Update heights
@@ -256,15 +279,15 @@ AVLNode<T>* RotateLeft(AVLNode<T>* node)
 
 	//updates sums 
 	if (left_node) {
-		node->right_sum = left_node->left_sum + left_node->right_sum + (int)left_node->key;
+		//node->right_sum = left_node->left_sum + left_node->right_sum + (int)left_node->key;
 		node->num_of_right = left_node->num_of_left + left_node->num_of_right + 1;
 	}
 	else {
-		node->right_sum = 0;
+		//node->right_sum = 0;
 		node->num_of_right = 0;
 	}
 
-	right_node->left_sum = node->left_sum + node->right_sum + (int)node->key;
+	//right_node->left_sum = node->left_sum + node->right_sum + (int)node->key;
 	right_node->num_of_left = node->num_of_left + node->num_of_right + 1;
 
 	// Update heights
@@ -296,22 +319,22 @@ AVLNode<T>* InsertDataByKey(AVLNode<T>* node, T data, double key, int* not_inser
 	}
 	AVLNode<T>* temp_node;
 	if (key < node->key) {
-		node->left_sum += (int)key;
+		//node->left_sum += (int)key;
 		node->num_of_left++;
 		temp_node = InsertDataByKey(node->left, data, key, not_inserted);
 		if (*not_inserted) {
 			node->num_of_left--;
-			node->left_sum -= (int)key;
+			//node->left_sum -= (int)key;
 		}
 		node->left = temp_node;
 	}
 	else if (key > node->key) {
-		node->right_sum += (int)key;
+		//node->right_sum += (int)key;
 		node->num_of_right++;
 		temp_node = InsertDataByKey(node->right, data, key, not_inserted);
 		if (*not_inserted) {
 			node->num_of_right--;
-			node->right_sum -= (int)key;
+			//node->right_sum -= (int)key;
 		}
 		node->right = temp_node;
 	}
@@ -374,22 +397,22 @@ AVLNode<T>* deleteNode(AVLNode<T>* root, double key, int* not_deleted)
 
 	AVLNode<T>* temp_node;
 	if (key < root->key) {
-		root->left_sum -= (int)key;
+		//root->left_sum -= (int)key;
 		root->num_of_left--;
 		temp_node = deleteNode(root->left, key, not_deleted);
 		if (*not_deleted) {
 			root->num_of_left++;
-			root->left_sum += (int)key;
+			//root->left_sum += (int)key;
 		}
 		root->left = temp_node;
 	}
 	else if (key > root->key) {
-		root->right_sum -= (int)key;
+		//root->right_sum -= (int)key;
 		root->num_of_right--;
 		temp_node = deleteNode(root->right, key, not_deleted);
 		if (*not_deleted) {
 			root->num_of_right++;
-			root->right_sum += (int)key;
+			//root->right_sum += (int)key;
 		}
 		root->right = temp_node;
 	}
@@ -418,7 +441,7 @@ AVLNode<T>* deleteNode(AVLNode<T>* root, double key, int* not_deleted)
 			AVLNode<T>* temp = getNextMinValue(root);
 
 			root->num_of_right--;
-			root->right_sum -= (int)temp->key;
+			//root->right_sum -= (int)temp->key;
 
 			root->key = temp->key;
 			root->data = temp->data;
@@ -531,7 +554,7 @@ int ReverseRank(AVLNode<T> *root, int key) {
 }
 
 
-
+// for debugging purpuses only //
 // prints AVL tree in an inorder way
 template <class T>
 void inOrder(AVLNode<T> *root, AVLNode<T> *node)
@@ -540,8 +563,8 @@ void inOrder(AVLNode<T> *root, AVLNode<T> *node)
 	if (node != nullptr)
 	{
 		inOrder(root, node->left);
-		cout << node->key << "  left sum = " << node->left_sum <<
-			" right sum = " << node->right_sum << "  left num = " << node->num_of_left <<
+		cout << node->key <</* "  left sum = " << node->left_sum <<
+			" right sum = " << node->right_sum <<*/ "  left num = " << node->num_of_left <<
 			" right num = " << node->num_of_right << " rank = "
 			<< Rank(root, node->key) << " reverse rank = "
 			<< ReverseRank(root, node->key) << std::endl;
@@ -597,7 +620,7 @@ AVLNode<T>* AVLTree<T>::GetKHighestNde(int k) {
 	return GetKNode(root, k - 1);
 }
 
-
+/*
 template <class T>
 void GetKSum(AVLNode<T>* node, double key , int* sum) {
 	//cout << node->key << "    " << *sum << endl;
@@ -610,7 +633,6 @@ void GetKSum(AVLNode<T>* node, double key , int* sum) {
 	else
 		*sum += node->right_sum + (int)node->key;
 }
-
 
 template <class T>
 int AVLTree<T>::GetKHighestSum(int k) {
@@ -627,7 +649,7 @@ int AVLTree<T>::GetKHighestSum(int k) {
 		GetKSum(root, k_node->key, &sum);
 	return sum;
 }
-
+*/
 
 
 
