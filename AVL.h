@@ -30,13 +30,13 @@ template <class T>
 class AVLNode {
 public:
 	T data;
-	double key;
+	CLASS_AVL_KEY key;
 	//int left_sum, right_sum;
 	int num_of_left, num_of_right;
 	AVLNode *left, *right;
 	int depth;
 
-	AVLNode(T d , double k = 0) : data(d), key(k), depth(1) , num_of_left(0),
+	AVLNode(T d , CLASS_AVL_KEY k = 0) : data(d), key(k), depth(1) , num_of_left(0),
 		num_of_right(0) /*,left_sum(0), right_sum(0)*/, left(nullptr), right(nullptr) {}
 	~AVLNode() = default;
 };
@@ -52,9 +52,9 @@ public:
 	AVLTree() : root(nullptr) {}
 	~AVLTree();
 
-	void Insert(T data, double key);
-	void Delete(double key);
-	T* Find(double key);
+	void Insert(T data, CLASS_AVL_KEY key);
+	void Delete(CLASS_AVL_KEY key);
+	T* Find(CLASS_AVL_KEY key);
 
 	void PrintInOrder();//for debugging purposes
 	AVLNode<T>* GetKHighestNde(int k);
@@ -311,14 +311,14 @@ int getBalance(AVLNode<T>* node)
 
 //Insert a key of type T into the AVL tree
 template <class T>
-AVLNode<T>* InsertDataByKey(AVLNode<T>* node, T data, double key, int* not_inserted) {
+AVLNode<T>* InsertDataByKey(AVLNode<T>* node, T data, CLASS_AVL_KEY key, int* not_inserted) {
 	if (node == nullptr)
 	{
 		AVLNode<T>* new_node = new AVLNode<T>(data, key);
 		return new_node;
 	}
 	AVLNode<T>* temp_node;
-	if (key < node->key) {
+	if (node->key > key) {
 		//node->left_sum += (int)key;
 		node->num_of_left++;
 		temp_node = InsertDataByKey(node->left, data, key, not_inserted);
@@ -352,7 +352,7 @@ AVLNode<T>* InsertDataByKey(AVLNode<T>* node, T data, double key, int* not_inser
 	// balancing the tree based on an avl tree algoritam
 
 	// Left Left Case
-	if (balance > 1 && key < node->left->key)
+	if (balance > 1 && node->left->key > key)
 		return RotateRight(node);
 
 	// Right Right Case
@@ -366,7 +366,7 @@ AVLNode<T>* InsertDataByKey(AVLNode<T>* node, T data, double key, int* not_inser
 	}
 
 	// Right Left Case
-	if (balance < -1 && key < node->right->key)
+	if (balance < -1 && node->right->key > key)
 	{
 		node->right = RotateRight(node->right);
 		return RotateLeft(node);
@@ -388,7 +388,7 @@ AVLNode<T> * getNextMinValue(AVLNode<T>* node)
 
 // delete a node from AVL tree with the given key
 template <class T>
-AVLNode<T>* deleteNode(AVLNode<T>* root, double key, int* not_deleted)
+AVLNode<T>* deleteNode(AVLNode<T>* root, CLASS_AVL_KEY key, int* not_deleted)
 {
 	if (root == nullptr) {
 		*not_deleted = 1;
@@ -396,7 +396,7 @@ AVLNode<T>* deleteNode(AVLNode<T>* root, double key, int* not_deleted)
 	}
 
 	AVLNode<T>* temp_node;
-	if (key < root->key) {
+	if (root->key > key) {
 		//root->left_sum -= (int)key;
 		root->num_of_left--;
 		temp_node = deleteNode(root->left, key, not_deleted);
@@ -485,7 +485,7 @@ AVLNode<T>* deleteNode(AVLNode<T>* root, double key, int* not_deleted)
 }
 
 template <class T>
-AVLNode<T>* findKey(AVLNode<T>* root, double key) {
+AVLNode<T>* findKey(AVLNode<T>* root, CLASS_AVL_KEY key) {
 	if (root == nullptr)
 		return root;
 
@@ -574,19 +574,19 @@ void inOrder(AVLNode<T> *root, AVLNode<T> *node)
 }
 
 template <class T>
-void AVLTree<T>::Delete(double key) {
+void AVLTree<T>::Delete(CLASS_AVL_KEY key) {
 	int not_deleted = 0;
 	root = deleteNode(root, key, &not_deleted);
 }
 
 template <class T>
-void AVLTree<T>::Insert(T data, double key) {
+void AVLTree<T>::Insert(T data, CLASS_AVL_KEY key) {
 	int not_inserted = 0;
 	root = InsertDataByKey(root, data, key, &not_inserted);
 }
 
 template <class T>
-T* AVLTree<T>::Find(double key) {
+T* AVLTree<T>::Find(CLASS_AVL_KEY key) {
 	AVLNode<T>* data_node;
 	data_node = findKey(root, key);
 	return &(data_node->data);
@@ -622,7 +622,7 @@ AVLNode<T>* AVLTree<T>::GetKHighestNde(int k) {
 
 /*
 template <class T>
-void GetKSum(AVLNode<T>* node, double key , int* sum) {
+void GetKSum(AVLNode<T>* node, CLASS_AVL_KEY key , int* sum) {
 	//cout << node->key << "    " << *sum << endl;
 	if (node->key < key)
 		GetKSum(node->right, key, sum);

@@ -22,9 +22,9 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
     //course has no Lessons
     if (numOfLessons == 0){
         //simply remove from hash table
+        delete tempCourseInTable;
         return (StatusTypeCL)courses.Remove(courseID);
     }
-    totalNumOfLessons -= numOfLessons;
     //delete all Lessons with views from viewed tree,
     //and all lesson with no views from course itself
     for (int i = 0; i < numOfLessons; ++i) {
@@ -38,7 +38,11 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
                 //TODO -currently using lesson ID
                 //delete from tree and table
                 viewedNumOfLessons--;
-                viewed_lessons_tree.Delete(tempLesson->GetLessonID());
+                CLASS_AVL_KEY toDel(tempLesson->GetTimeWatched(),
+                                    tempLesson->GetLessonID(),
+                                    tempLesson->GetCourse());
+
+                viewed_lessons_tree.Delete(toDel);
             }//delete only from table
             lessons->Remove(i);
             delete tempLesson;
@@ -49,7 +53,7 @@ StatusTypeCL LectureManager::RemoveCourse(int courseID) {
     return SUCCESS_CL;
 }
 
-StatusTypeCL LectureManager::AddLecture(int courseID, int *lectureID) {
+StatusTypeCL LectureManager::AddLesson(int courseID, int *lectureID) {
     Course* tempCourseInTable = courses.Find(courseID);
 
     //course does not exist
@@ -59,7 +63,6 @@ StatusTypeCL LectureManager::AddLecture(int courseID, int *lectureID) {
         Lesson *Lesson_to_add = new Lesson(courseID,numOfLessons);
         *lectureID = numOfLessons;
         tempCourseInTable->IncNumOfLessons();
-        totalNumOfLessons++;
         return (StatusTypeCL)tempCourseInTable->
         GetLessonsTable()->Insert(*lectureID,Lesson_to_add);
     }
@@ -78,14 +81,18 @@ StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
         return INVALID_INPUT_CL;
     }
     Lesson * addTo = tempCourseInTable->GetLessonsTable()->Find(classID);
-    /******* lesson does not exist -  not supposed to happen  ******/
+    /******* lesson does not exist  ******/
     if (!addTo) return FAILURE_CL;
+    CLASS_AVL_KEY tempKey(addTo->GetTimeWatched(),
+                          addTo->GetLessonID(),
+                          addTo->GetCourse());
 
-    // TODO do we take out of hash table or not?
     if (addTo->GetTimeWatched() == 0){ //not in viewed tree yet
         addTo->watchLesson(time);
-        //TODO how do we tell apart lessons in your tree?
-        viewed_lessons_tree.Insert(addTo,addTo->GetLessonID());
+        CLASS_AVL_KEY newKey(addTo->GetTimeWatched(),
+                              addTo->GetLessonID(),
+                              addTo->GetCourse());
+        viewed_lessons_tree.Insert(addTo,newKey);
         viewedNumOfLessons++;
         return SUCCESS_CL;
 //        if(Not_Viewed_course_ptr->GetNotViewedList() == nullptr) {
@@ -104,10 +111,13 @@ StatusTypeCL LectureManager::WatchClass(int courseID, int classID, int time) {
     //TODO argument in tree and in table are the same (we only hold pointers to it)
 //    //find in watched tree
 //    Lesson* temp = *viewed_lessons_tree.Find(addTo->GetLessonID());
-    viewed_lessons_tree.Delete(addTo->GetLessonID());
+    viewed_lessons_tree.Delete(tempKey);
     addTo->watchLesson(time);
+    CLASS_AVL_KEY newKey(addTo->GetTimeWatched(),
+                         addTo->GetLessonID(),
+                         addTo->GetCourse());
     //delete from tree and re insert
-    viewed_lessons_tree.Insert(addTo,addTo->GetLessonID());
+    viewed_lessons_tree.Insert(addTo,newKey);
     return SUCCESS_CL;
 }
 

@@ -32,7 +32,7 @@ StatusType RemoveCourse(void *DS, int courseID) {
 /**            O(1) input average          */
 StatusType AddClass(void *DS, int courseID, int *classID) {
     if (DS == nullptr || courseID<=0) return INVALID_INPUT;
-    return (StatusType)((LectureManager*) DS)->AddLecture(courseID,classID);
+    return (StatusType) ((LectureManager *) DS)->AddLesson(courseID, classID);
 }
 
 

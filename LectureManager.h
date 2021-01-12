@@ -22,14 +22,13 @@ private:
     /**           implement new DB                   **/
     HASH_TABLE<Course> courses;
     AVLTree<Lesson*> viewed_lessons_tree;
-    int totalNumOfLessons;
     int viewedNumOfLessons;
 public:
     LectureManager() = default;
     ~LectureManager() = default;
     StatusTypeCL AddCourse(int courseID);
     StatusTypeCL RemoveCourse(int courseID);
-    StatusTypeCL AddLecture(int courseID, int* lectureID);
+    StatusTypeCL AddLesson(int courseID, int* lectureID);
     StatusTypeCL WatchClass(int courseID, int classID, int time);
     StatusTypeCL TimeViewed(int courseID, int classId, int *timeViewed);
     StatusTypeCL GetIthWatchedClass(int i, int* courseID, int* classID);
