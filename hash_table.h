@@ -93,7 +93,7 @@ StatusTypeHashTable HASH_TABLE<T>::Insert(int key, T* item) {
 	}
 	else {
 		HTNode<T> *curr_node = table[modified_key];
-		if ((*curr_node).data == item) {
+		if (*(*curr_node).data == *item) {
 			return FAILURE_HT;
 		}
 		while ((*curr_node).next) {
