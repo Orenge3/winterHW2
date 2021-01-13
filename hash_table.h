@@ -98,7 +98,7 @@ StatusTypeHashTable HASH_TABLE<T>::Insert(int key, T* item) {
 		}
 		while ((*curr_node).next) {
 			curr_node = (*curr_node).next;
-			if ((*curr_node).data == item) {
+			if (*(*curr_node).data == *item) {
 				return FAILURE_HT;
 			}
 		}
@@ -188,7 +188,7 @@ StatusTypeHashTable HASH_TABLE<T>::Remove(int key) {
 			if ((*curr_node).next)
 				(*curr_node).next->prev = nullptr;
 			table[modified_key] = (*curr_node).next;
-			T* out_data = (*curr_node).data;
+//			T* out_data = (*curr_node).data;
 			delete curr_node;
 			num_of_items--;
 			if (num_of_items <= ratio * size_of_table / 2 && size_of_table > ORIGINAL_SIZE) {
@@ -205,7 +205,7 @@ StatusTypeHashTable HASH_TABLE<T>::Remove(int key) {
 					(*curr_node).prev->next = (*curr_node).next;
 					if ((*curr_node).next)
 						(*curr_node).next->prev = (*curr_node).prev;
-					T* out_data = (*curr_node).data;
+//					T* out_data = (*curr_node).data;
 					delete curr_node;
 					num_of_items--;
 					if (num_of_items <= ratio * size_of_table / 2 && size_of_table > ORIGINAL_SIZE) {

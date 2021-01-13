@@ -31,10 +31,10 @@ class AVLNode {
 public:
 	T data;
 	CLASS_AVL_KEY key;
-	//int left_sum, right_sum;
+    int depth;
+    //int left_sum, right_sum;
 	int num_of_left, num_of_right;
-	AVLNode *left, *right;
-	int depth;
+    AVLNode *left, *right;
 
 	AVLNode(T d , CLASS_AVL_KEY k = 0) : data(d), key(k), depth(1) , num_of_left(0),
 		num_of_right(0) /*,left_sum(0), right_sum(0)*/, left(nullptr), right(nullptr) {}
